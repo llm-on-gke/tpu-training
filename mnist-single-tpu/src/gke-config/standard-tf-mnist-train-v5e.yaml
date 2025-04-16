@@ -11,7 +11,7 @@ spec:
     spec:
       nodeSelector:
         cloud.google.com/gke-tpu-topology: 2x2  # target topology
-        cloud.google.com/gke-tpu-accelerator: tpu-v5-lite-podslice
+        cloud.google.com/gke-tpu-accelerator: tpu-v6e-slice #tpu-v5-lite-podslice
       containers:
       - name: tensorflow
         image: tensorflow/tensorflow:2.14.0
