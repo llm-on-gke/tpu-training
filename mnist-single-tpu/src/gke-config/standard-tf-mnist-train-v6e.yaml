@@ -17,8 +17,18 @@ spec:
         image: tensorflow/tensorflow:2.14.0
         securityContext:
           privileged: true
-        command: ["/bin/bash", "-c", "--"]
-        args: ["cd /data/tensorflow-mnist-example; pip3 install -r requirements.txt; python3 tensorflow_mnist_train_distributed.py"]
+        command:
+              - bash
+              - -xc
+              - |
+                cd /data/tensorflow-mnist-example
+                chmod +x script.sh
+                ./trainer.sh
+
+                
+        #command: ["/bin/bash", "-c", "--"]
+        #args: ["cd /data/tensorflow-mnist-example; pip3 install -r requirements.txt; python3 tensorflow_mnist_train_distributed.py"]
+                 
         resources:
           requests:
             google.com/tpu: "4"  # TPU chip request
