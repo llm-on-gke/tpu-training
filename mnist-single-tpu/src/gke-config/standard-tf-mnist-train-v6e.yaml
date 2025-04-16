@@ -14,7 +14,7 @@ spec:
         cloud.google.com/gke-tpu-accelerator: tpu-v6e-slice #tpu-v5-lite-podslice
       containers:
       - name: tensorflow
-        image: tensorflow/tensorflow:2.17.0
+        image: python:3.8 #tensorflow/tensorflow:2.14.0
         securityContext:
           privileged: true
         command:
@@ -22,7 +22,7 @@ spec:
               - -xc
               - |
                 cd /data/tensorflow-mnist-example
-                chmod +x script.sh
+                chmod +x trainer.sh
                 sleep infinity
                 ./trainer.sh
 
