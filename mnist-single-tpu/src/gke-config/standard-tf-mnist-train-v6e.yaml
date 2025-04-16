@@ -14,15 +14,16 @@ spec:
         cloud.google.com/gke-tpu-accelerator: tpu-v6e-slice #tpu-v5-lite-podslice
       containers:
       - name: tensorflow
-        image: python:3.8 #tensorflow/tensorflow:2.14.0
+        image: python:3.10 #tensorflow/tensorflow:2.14.0
         securityContext:
           privileged: true
         command:
               - bash
               - -xc
               - |
+                pip install https://storage.googleapis.com/cloud-tpu-tpuvm-artifacts/tensorflow/tf-2.15.0/tensorflow-2.15.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+                curl -L https://storage.googleapis.com/cloud-tpu-tpuvm-artifacts/libtpu/1.9.0/libtpu.so -o /lib/libtpu.so
                 cd /data/tensorflow-mnist-example
-                chmod +x trainer.sh
                 sleep infinity
                 ./trainer.sh
 
