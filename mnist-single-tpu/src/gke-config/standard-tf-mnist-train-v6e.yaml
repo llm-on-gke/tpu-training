@@ -34,7 +34,7 @@ spec:
                 tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
                 strategy = tf.distribute.TPUStrategy(cluster_resolver)
                 print("All devices: ", tf.config.list_logical_devices("TPU"))'
-                sleep infinity
+                #sleep infinity
                 ./trainer.sh
 
                 
