@@ -21,9 +21,19 @@ spec:
               - bash
               - -xc
               - |
-                pip install https://storage.googleapis.com/cloud-tpu-tpuvm-artifacts/tensorflow/tf-2.15.0/tensorflow-2.15.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-                curl -L https://storage.googleapis.com/cloud-tpu-tpuvm-artifacts/libtpu/1.9.0/libtpu.so -o /lib/libtpu.so
-                cd /data/tensorflow-mnist-example
+                pip install --user setuptools==65.5.0
+                pip install cloud-tpu-client
+                pip install gin-config && pip install tensorflow-datasets && pip install tf-keras-nightly --no-deps
+                pip install https://storage.googleapis.com/tensorflow-public-build-artifacts/prod/tensorflow/official/release/nightly/linux_x86_tpu/wheel_py310/749/20240915-062017/github/tensorflow/build_output/tf_nightly_tpu-2.18.0.dev20240915-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl -f https://storage.googleapis.com/libtpu-tf-releases/index.html --force
+                TF_USE_LEGACY_KERAS=1 TPU_NAME=local python3 -c \
+                'import tensorflow as tf
+                import os
+                print("TensorFlow version " + tf.__version__)
+                cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver()
+                tf.config.experimental_connect_to_cluster(cluster_resolver)
+                tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
+                strategy = tf.distribute.TPUStrategy(cluster_resolver)
+                print("All devices: ", tf.config.list_logical_devices("TPU"))'
                 sleep infinity
                 ./trainer.sh
 
