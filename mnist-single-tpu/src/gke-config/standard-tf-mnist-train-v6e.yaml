@@ -35,6 +35,7 @@ spec:
                 strategy = tf.distribute.TPUStrategy(cluster_resolver)
                 print("All devices: ", tf.config.list_logical_devices("TPU"))'
                 #sleep infinity
+                cd /data/tensorflow-mnist-example
                 ./trainer.sh
 
                 
