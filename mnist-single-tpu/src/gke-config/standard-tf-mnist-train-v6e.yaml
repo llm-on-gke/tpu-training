@@ -36,7 +36,8 @@ spec:
                 print("All devices: ", tf.config.list_logical_devices("TPU"))'
                 #sleep infinity
                 cd /data/tensorflow-mnist-example
-                ./trainer.sh
+                chmod +x trainer.sh
+                bash trainer.sh
 
                 
         #command: ["/bin/bash", "-c", "--"]
