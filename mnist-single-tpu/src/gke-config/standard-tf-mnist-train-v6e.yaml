@@ -42,7 +42,10 @@ spec:
                 
         #command: ["/bin/bash", "-c", "--"]
         #args: ["cd /data/tensorflow-mnist-example; pip3 install -r requirements.txt; python3 tensorflow_mnist_train_distributed.py"]
-                 
+        env:
+        - name: install_data
+          value: "true"
+                    
         resources:
           requests:
             google.com/tpu: "4"  # TPU chip request
