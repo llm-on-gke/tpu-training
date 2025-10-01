@@ -73,10 +73,10 @@ spec:
                 - -c
                 - |
                   printenv
-                  RUN_NAME=torchax-llama70b-tuning
+                  RUN_NAME=torchax-llama7b-tuning
                   sleep infinity
                   pip install flax
-                  cd /xla/torchax/examples/train_llama_torchtitan
+                  cd /app
                   python train_llama.py --seqlen=8192
                 
                 resources:

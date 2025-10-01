@@ -75,8 +75,8 @@ spec:
                   RUN_NAME=torchax-llama70b-tuning
                   sleep infinity
                   #pip install flax
-                  cd /xla/torchax/examples/train_llama
-                  python train_llama_lightning.py --mode=all --seqlen=8192 --checkpoint_dir=/gcs-dir/hf-data/llama3.1-8b-it-hf
+                  cd /app
+                  python train_llama_lightning.py --mode=regular --seqlen=8192 --checkpoint_dir=/gcs-dir/hf-data/llama3.1-8b-it-hf
                 
                 resources:
                   limits:

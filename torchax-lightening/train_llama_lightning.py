@@ -30,7 +30,7 @@ def _setup_default_env():
 
 _setup_default_env()
 
-default_checkpoint_dir = '/home/hanq/litgpt/checkpoints/meta-llama/Meta-Llama-3-8B/'
+default_checkpoint_dir = '/gcs-dir/hf-data/llama3.1-8b-it-hf/'
 
 
 class GPTLightningModule(lightning.LightningModule):
