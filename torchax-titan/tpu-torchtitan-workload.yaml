@@ -1,0 +1,87 @@
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: maxtext-vlp16-default  # JobSet name (<jobSetName>)
+  annotations:
+    alpha.jobset.sigs.k8s.io/exclusive-topology: cloud.google.com/gke-nodepool # 1:1 job replica to node pool assignment
+spec:
+  failurePolicy:
+    maxRestarts: 3  # The set will be restarted on failures up to 4 times.
+  replicatedJobs:
+    - name: slice    # Part of the name of the child Jobs (<replicateJobName>)
+      replicas: 1    # Number of slices
+      template:
+        spec:
+          parallelism: 1   # Must be set to number of nodes in each node pool
+          completions: 1   # Must be set to number of nodes in each node pool
+          backoffLimit: 0   # Must be set to 0. Fail the job when any pod fails.
+          template:
+            metadata:
+              annotations:
+                #iam.gke.io/gcp-service-account: "${GCP_SERVICE_ACCOUNT}"
+                gke-gcsfuse/volumes: "true"
+            spec:
+              hostNetwork: true
+              dnsPolicy: ClusterFirstWithHostNet
+              nodeSelector:
+                cloud.google.com/gke-tpu-accelerator: tpu-v6e-slice
+                cloud.google.com/gke-tpu-topology: 2x2
+              serviceAccountName: storage-access
+              volumes:
+              - name: gcs-fuse-csi-ephemeral
+                csi:
+                  driver: gcsfuse.csi.storage.gke.io
+                  readOnly: false
+                  volumeAttributes:
+                   bucketName: rick-maxdiffusion
+                   mountOptions: "implicit-dirs"
+                   fileCacheCapacity: "-1Mi"
+                   fileCacheForRangeRead: "true"
+                   metadataCacheTTLSeconds: "-1"
+                   metadataNegativeCacheTTLSeconds: "0"
+                   metadataStatCacheCapacity: "-1Mi"
+                   metadataTypeCacheCapacity: "-1Mi"
+              containers:
+              - name: jax-tpu
+                image: us-east4-docker.pkg.dev/diesel-patrol-382622/gke-llm/torchax-titan:latest
+                
+                imagePullPolicy: Always
+                env:
+                - name: HUGGING_FACE_HUB_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                     name: huggingface
+                     key: HF_TOKEN
+                - name: JOBSET_NAME
+                  value: "maxtext-vlp16-default"
+                - name: LIBTPU_INIT_ARGS
+                  value: "--xla_tpu_use_minor_sharding_for_major_trivial_input=true --xla_tpu_relayout_group_size_threshold_for_reduce_scatter=1 --xla_tpu_scoped_vmem_limit_kib=98304 --xla_tpu_enable_data_parallel_all_reduce_opt=true --xla_tpu_data_parallel_opt_different_sized_ops=true --xla_tpu_enable_async_collective_fusion=true --xla_tpu_enable_async_collective_fusion_fuse_all_gather=true --xla_tpu_enable_async_collective_fusion_multiple_steps=true --xla_tpu_overlap_compute_collective_tc=true --xla_enable_async_all_gather=true"
+
+                - name: TPU_STDERR_LOG_LEVEL
+                  value: "0"
+                - name: TPU_MIN_LOG_LEVEL
+                  value: "0"
+                - name: TF_CPP_MIN_LOG_LEVEL
+                  value: "0"
+                ports:
+                - containerPort: 8471
+                - containerPort: 8080 # Port for MXLA coordinator
+                securityContext:
+                  privileged: true
+                command:
+                - bash
+                - -c
+                - |
+                  printenv
+                  RUN_NAME=torchax-llama70b-tuning
+                  sleep infinity
+                  pip install flax
+                  cd /xla/torchax/examples/train_llama_torchtitan
+                  python train_llama.py --seqlen=8192
+                
+                resources:
+                  limits:
+                    google.com/tpu: 4
+                volumeMounts:
+                - name: gcs-fuse-csi-ephemeral
+                  mountPath: /gcs-dir
